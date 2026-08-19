@@ -1,6 +1,6 @@
 --// SECRET C v1
---// Speed Menu + Snow + velocidad durante el robo de Brainrots
---// LocalScript -> StarterPlayer > StarterPlayerScripts
+--// Menú de velocidad + copos de nieve
+--// LocalScript → StarterPlayer > StarterPlayerScripts
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -19,7 +19,7 @@ local SPEED_STEP = 10
 local currentSpeed = 16
 
 --==================================================
--- GUI
+-- GUI PRINCIPAL
 --==================================================
 
 local gui = Instance.new("ScreenGui")
@@ -78,7 +78,7 @@ menuStroke.Thickness = 2
 menuStroke.Parent = menu
 
 --==================================================
--- NIEVE
+-- ❄️ NIEVE
 --==================================================
 
 local snowContainer = Instance.new("Frame")
@@ -150,7 +150,11 @@ local function createSnowflake()
 	tween:Play()
 
 	tween.Completed:Connect(function()
-		snowflake:Destroy()
+
+		if snowflake then
+			snowflake:Destroy()
+		end
+
 	end)
 end
 
@@ -163,6 +167,7 @@ task.spawn(function()
 		end
 
 		task.wait(0.12)
+
 	end
 
 end)
@@ -183,7 +188,7 @@ title.ZIndex = 5
 title.Parent = menu
 
 --==================================================
--- LÍNEA
+-- LÍNEA AZUL
 --==================================================
 
 local line = Instance.new("Frame")
@@ -195,7 +200,7 @@ line.ZIndex = 5
 line.Parent = menu
 
 --==================================================
--- VELOCIDAD
+-- TEXTO DE VELOCIDAD
 --==================================================
 
 local speedLabel = Instance.new("TextLabel")
@@ -210,7 +215,7 @@ speedLabel.ZIndex = 5
 speedLabel.Parent = menu
 
 --==================================================
--- CREADOR DE BOTONES
+-- CREAR BOTONES
 --==================================================
 
 local function createButton(text, y)
@@ -224,6 +229,7 @@ local function createButton(text, y)
 		Color3.fromRGB(9, 19, 38)
 
 	button.Text = text
+
 	button.TextColor3 =
 		Color3.fromRGB(240, 250, 255)
 
@@ -243,6 +249,7 @@ local function createButton(text, y)
 	stroke.Thickness = 2
 	stroke.Parent = button
 
+	-- Efecto al pasar por encima
 	button.MouseEnter:Connect(function()
 
 		TweenService:Create(
@@ -270,7 +277,12 @@ local function createButton(text, y)
 	end)
 
 	return button
+
 end
+
+--==================================================
+-- BOTONES DE VELOCIDAD
+--==================================================
 
 local increaseButton =
 	createButton(
@@ -312,9 +324,12 @@ local function applySpeed()
 		)
 
 	if humanoid then
+
 		humanoid.WalkSpeed =
 			currentSpeed
+
 	end
+
 end
 
 --==================================================
@@ -342,75 +357,21 @@ decreaseButton.MouseButton1Click:Connect(function()
 end)
 
 --==================================================
--- MANTENER VELOCIDAD
+-- AL REAPARECER
 --==================================================
 
-local function protectSpeed(humanoid)
-
-	if not humanoid then
-		return
-	end
-
-	humanoid.WalkSpeed =
-		currentSpeed
-
-	humanoid:GetPropertyChangedSignal(
-		"WalkSpeed"
-	):Connect(function()
-
-		if humanoid.Parent
-			and humanoid.WalkSpeed
-			~= currentSpeed then
-
-			task.defer(function()
-
-				if humanoid.Parent then
-
-					humanoid.WalkSpeed =
-						currentSpeed
-
-				end
-
-			end)
-
-		end
-
-	end)
-
-end
-
---==================================================
--- PERSONAJE
---==================================================
-
-local function setupCharacter(character)
+player.CharacterAdded:Connect(function(character)
 
 	local humanoid =
-		character:WaitForChild(
-			"Humanoid"
-		)
+		character:WaitForChild("Humanoid")
 
 	humanoid.WalkSpeed =
 		currentSpeed
 
-	protectSpeed(humanoid)
-
-end
-
-if player.Character then
-
-	setupCharacter(
-		player.Character
-	)
-
-end
-
-player.CharacterAdded:Connect(
-	setupCharacter
-)
+end)
 
 --==================================================
--- BOTÓN SC: ABRIR / CERRAR
+-- ABRIR / CERRAR MENÚ
 --==================================================
 
 local menuOpen = false
@@ -475,7 +436,7 @@ scButton.MouseButton1Click:Connect(function()
 end)
 
 --==================================================
--- EFECTO BOTÓN SC
+-- EFECTO DEL BOTÓN SC
 --==================================================
 
 scButton.MouseEnter:Connect(function()
@@ -494,3 +455,18 @@ end)
 scButton.MouseLeave:Connect(function()
 
 	TweenService:Create(
+		scButton,
+		TweenInfo.new(0.15),
+		{
+			BackgroundColor3 =
+				Color3.fromRGB(7, 12, 25)
+		}
+	):Play()
+
+end)
+
+--==================================================
+-- VELOCIDAD INICIAL
+--==================================================
+
+applySpeed()
