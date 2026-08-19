@@ -1,150 +1,123 @@
+-- SC Menu + Noclip
+-- LocalScript en StarterPlayerScripts
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
-local flying = false
-local speed = 60
-local flyConnection
-local bodyVelocity
-local bodyGyro
+local noclip = false
+local menuOpen = false
 
--- Crear GUI
+-- GUI
 local gui = Instance.new("ScreenGui")
-gui.Name = "FlyMenu"
+gui.Name = "SCMenu"
 gui.ResetOnSpawn = false
-gui.Parent = player:WaitForChild("PlayerGui")
+gui.Parent = playerGui
 
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 160, 0, 55)
-frame.Position = UDim2.new(0.5, -80, 1, -75)
-frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-frame.BorderSizePixel = 0
-frame.Parent = gui
+-- Botón SC
+local scButton = Instance.new("TextButton")
+scButton.Name = "SCButton"
+scButton.Size = UDim2.new(0, 55, 0, 55)
+scButton.Position = UDim2.new(0, 15, 1, -70)
+scButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+scButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+scButton.Text = "SC"
+scButton.TextSize = 20
+scButton.Font = Enum.Font.GothamBold
+scButton.Parent = gui
 
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 10)
-corner.Parent = frame
+local scCorner = Instance.new("UICorner")
+scCorner.CornerRadius = UDim.new(0, 10)
+scCorner.Parent = scButton
 
-local button = Instance.new("TextButton")
-button.Size = UDim2.new(1, -10, 1, -10)
-button.Position = UDim2.new(0, 5, 0, 5)
-button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-button.TextColor3 = Color3.new(1, 1, 1)
-button.TextSize = 18
-button.Font = Enum.Font.GothamBold
-button.Text = "VOLAR: OFF"
-button.Parent = frame
+-- Menú
+local menu = Instance.new("Frame")
+menu.Name = "Menu"
+menu.Size = UDim2.new(0, 220, 0, 120)
+menu.Position = UDim2.new(0, 15, 1, -200)
+menu.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+menu.Visible = false
+menu.Parent = gui
 
-local buttonCorner = Instance.new("UICorner")
-buttonCorner.CornerRadius = UDim.new(0, 8)
-buttonCorner.Parent = button
+local menuCorner = Instance.new("UICorner")
+menuCorner.CornerRadius = UDim.new(0, 12)
+menuCorner.Parent = menu
 
-local function stopFlying()
-	flying = false
+-- Botón Noclip
+local noclipButton = Instance.new("TextButton")
+noclipButton.Name = "NoclipButton"
+noclipButton.Size = UDim2.new(1, -20, 0, 55)
+noclipButton.Position = UDim2.new(0, 10, 0, 15)
+noclipButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+noclipButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+noclipButton.Text = "Noclip: OFF"
+noclipButton.TextSize = 18
+noclipButton.Font = Enum.Font.GothamBold
+noclipButton.Parent = menu
 
-	if flyConnection then
-		flyConnection:Disconnect()
-		flyConnection = nil
-	end
+local noclipCorner = Instance.new("UICorner")
+noclipCorner.CornerRadius = UDim.new(0, 8)
+noclipCorner.Parent = noclipButton
 
-	if bodyVelocity then
-		bodyVelocity:Destroy()
-		bodyVelocity = nil
-	end
+-- Abrir/cerrar menú
+scButton.MouseButton1Click:Connect(function()
+	menuOpen = not menuOpen
+	menu.Visible = menuOpen
+end)
 
-	if bodyGyro then
-		bodyGyro:Destroy()
-		bodyGyro = nil
-	end
+-- Activar/desactivar noclip
+noclipButton.MouseButton1Click:Connect(function()
+	noclip = not noclip
 
-	button.Text = "VOLAR: OFF"
-	button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-end
-
-local function startFlying()
-	local character = player.Character or player.CharacterAdded:Wait()
-	local humanoid = character:WaitForChild("Humanoid")
-	local root = character:WaitForChild("HumanoidRootPart")
-
-	flying = true
-
-	button.Text = "VOLAR: ON"
-	button.BackgroundColor3 = Color3.fromRGB(40, 150, 70)
-
-	bodyVelocity = Instance.new("BodyVelocity")
-	bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-	bodyVelocity.Velocity = Vector3.zero
-	bodyVelocity.Parent = root
-
-	bodyGyro = Instance.new("BodyGyro")
-	bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-	bodyGyro.P = 9000
-	bodyGyro.Parent = root
-
-	flyConnection = RunService.RenderStepped:Connect(function()
-		if not flying or not character.Parent then
-			stopFlying()
-			return
-		end
-
-		local camera = workspace.CurrentCamera
-		local direction = Vector3.zero
-
-		if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-			direction += camera.CFrame.LookVector
-		end
-
-		if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-			direction -= camera.CFrame.LookVector
-		end
-
-		if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-			direction -= camera.CFrame.RightVector
-		end
-
-		if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-			direction += camera.CFrame.RightVector
-		end
-
-		if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-			direction += Vector3.new(0, 1, 0)
-		end
-
-		if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
-			direction -= Vector3.new(0, 1, 0)
-		end
-
-		if direction.Magnitude > 0 then
-			direction = direction.Unit * speed
-		end
-
-		bodyVelocity.Velocity = direction
-		bodyGyro.CFrame = camera.CFrame
-
-		humanoid.PlatformStand = true
-	end)
-end
-
-button.MouseButton1Click:Connect(function()
-	if flying then
-		stopFlying()
-
-		local character = player.Character
-		if character then
-			local humanoid = character:FindFirstChildOfClass("Humanoid")
-			if humanoid then
-				humanoid.PlatformStand = false
-			end
-		end
+	if noclip then
+		noclipButton.Text = "Noclip: ON"
+		noclipButton.BackgroundColor3 = Color3.fromRGB(0, 170, 80)
 	else
-		startFlying()
+		noclipButton.Text = "Noclip: OFF"
+		noclipButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 	end
 end)
 
-player.CharacterAdded:Connect(function()
-	if flying then
-		stopFlying()
+-- Noclip
+RunService.Stepped:Connect(function()
+	if not noclip then
+		return
+	end
+
+	local character = player.Character
+	if not character then
+		return
+	end
+
+	for _, part in ipairs(character:GetDescendants()) do
+		if part:IsA("BasePart") then
+			-- El HumanoidRootPart y las partes del personaje
+			-- atraviesan paredes.
+			-- El suelo sigue funcionando normalmente mediante
+			-- la gravedad y el Humanoid.
+			part.CanCollide = false
+		end
+	end
+end)
+
+-- Al desactivar, recuperar colisiones
+RunService.Stepped:Connect(function()
+	if noclip then
+		return
+	end
+
+	local character = player.Character
+	if not character then
+		return
+	end
+
+	for _, part in ipairs(character:GetDescendants()) do
+		if part:IsA("BasePart") then
+			if part.Name ~= "HumanoidRootPart" then
+				part.CanCollide = true
+			end
+		end
 	end
 end)
