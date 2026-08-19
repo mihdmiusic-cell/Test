@@ -1,5 +1,6 @@
--- Secret C v1 - Speed Menu
--- LocalScript → StarterPlayer > StarterPlayerScripts
+--// SECRET C v1
+--// Speed Menu + Snow + velocidad durante el robo de Brainrots
+--// LocalScript -> StarterPlayer > StarterPlayerScripts
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -7,47 +8,64 @@ local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
+--==================================================
 -- CONFIGURACIÓN
+--==================================================
+
 local MIN_SPEED = 16
 local MAX_SPEED = 500
 local SPEED_STEP = 10
+
 local currentSpeed = 16
 
--- GUI PRINCIPAL
+--==================================================
+-- GUI
+--==================================================
+
 local gui = Instance.new("ScreenGui")
 gui.Name = "SecretCV1"
 gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
 gui.Parent = playerGui
 
+--==================================================
 -- BOTÓN SC
+--==================================================
+
 local scButton = Instance.new("TextButton")
 scButton.Name = "SCButton"
-scButton.Size = UDim2.new(0, 55, 0, 55)
-scButton.Position = UDim2.new(0, 20, 0.5, -27)
-scButton.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
+scButton.Size = UDim2.fromOffset(58, 58)
+scButton.Position = UDim2.new(0, 20, 0.5, -29)
+scButton.BackgroundColor3 = Color3.fromRGB(7, 12, 25)
 scButton.Text = "SC"
-scButton.TextColor3 = Color3.fromRGB(255,255,255)
+scButton.TextColor3 = Color3.fromRGB(235, 250, 255)
 scButton.TextSize = 20
 scButton.Font = Enum.Font.GothamBold
 scButton.AutoButtonColor = false
+scButton.ZIndex = 20
 scButton.Parent = gui
 
 local scCorner = Instance.new("UICorner")
-scCorner.CornerRadius = UDim.new(0, 12)
+scCorner.CornerRadius = UDim.new(0, 13)
 scCorner.Parent = scButton
 
 local scStroke = Instance.new("UIStroke")
-scStroke.Color = Color3.fromRGB(0, 170, 255)
+scStroke.Color = Color3.fromRGB(0, 180, 255)
 scStroke.Thickness = 2
 scStroke.Parent = scButton
 
+--==================================================
 -- MENÚ
+--==================================================
+
 local menu = Instance.new("Frame")
 menu.Name = "MainMenu"
-menu.Size = UDim2.new(0, 330, 0, 310)
-menu.Position = UDim2.new(0.5, -165, 0.5, -155)
-menu.BackgroundColor3 = Color3.fromRGB(8, 12, 25)
+menu.Size = UDim2.fromOffset(340, 320)
+menu.Position = UDim2.new(0.5, -170, 0.5, -160)
+menu.BackgroundColor3 = Color3.fromRGB(5, 9, 20)
 menu.Visible = false
+menu.ClipsDescendants = true
+menu.ZIndex = 1
 menu.Parent = gui
 
 local menuCorner = Instance.new("UICorner")
@@ -55,51 +73,165 @@ menuCorner.CornerRadius = UDim.new(0, 18)
 menuCorner.Parent = menu
 
 local menuStroke = Instance.new("UIStroke")
-menuStroke.Color = Color3.fromRGB(0, 170, 255)
+menuStroke.Color = Color3.fromRGB(0, 175, 255)
 menuStroke.Thickness = 2
 menuStroke.Parent = menu
 
+--==================================================
+-- NIEVE
+--==================================================
+
+local snowContainer = Instance.new("Frame")
+snowContainer.Name = "Snow"
+snowContainer.Size = UDim2.fromScale(1, 1)
+snowContainer.BackgroundTransparency = 1
+snowContainer.ClipsDescendants = true
+snowContainer.ZIndex = 2
+snowContainer.Parent = menu
+
+local function createSnowflake()
+
+	local snowflake = Instance.new("TextLabel")
+
+	local size = math.random(7, 16)
+
+	snowflake.Size = UDim2.fromOffset(size, size)
+
+	snowflake.Position = UDim2.new(
+		math.random(0, 100) / 100,
+		0,
+		-0.1,
+		0
+	)
+
+	snowflake.BackgroundTransparency = 1
+	snowflake.Text = "❄"
+
+	snowflake.TextColor3 = Color3.fromRGB(
+		210,
+		240,
+		255
+	)
+
+	snowflake.TextTransparency =
+		math.random(0, 30) / 100
+
+	snowflake.TextSize = size + 5
+	snowflake.Font = Enum.Font.GothamBold
+	snowflake.ZIndex = 3
+	snowflake.Parent = snowContainer
+
+	local duration = math.random(4, 9)
+
+	local endX =
+		math.random(-10, 110) / 100
+
+	local tween = TweenService:Create(
+		snowflake,
+		TweenInfo.new(
+			duration,
+			Enum.EasingStyle.Linear
+		),
+		{
+			Position = UDim2.new(
+				endX,
+				0,
+				1.1,
+				0
+			),
+
+			Rotation = math.random(
+				-180,
+				180
+			)
+		}
+	)
+
+	tween:Play()
+
+	tween.Completed:Connect(function()
+		snowflake:Destroy()
+	end)
+end
+
+task.spawn(function()
+
+	while gui.Parent do
+
+		if menu.Visible then
+			createSnowflake()
+		end
+
+		task.wait(0.12)
+	end
+
+end)
+
+--==================================================
 -- TÍTULO
+--==================================================
+
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, -30, 0, 55)
-title.Position = UDim2.new(0, 15, 0, 10)
+title.Position = UDim2.fromOffset(15, 8)
 title.BackgroundTransparency = 1
 title.Text = "secreth C v1"
-title.TextColor3 = Color3.fromRGB(255,255,255)
-title.TextSize = 26
+title.TextColor3 = Color3.fromRGB(240, 250, 255)
+title.TextSize = 27
 title.Font = Enum.Font.GothamBold
+title.ZIndex = 5
 title.Parent = menu
 
--- LÍNEA DECORATIVA
+--==================================================
+-- LÍNEA
+--==================================================
+
 local line = Instance.new("Frame")
 line.Size = UDim2.new(1, -40, 0, 2)
-line.Position = UDim2.new(0, 20, 0, 65)
-line.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+line.Position = UDim2.fromOffset(20, 67)
+line.BackgroundColor3 = Color3.fromRGB(0, 175, 255)
 line.BorderSizePixel = 0
+line.ZIndex = 5
 line.Parent = menu
 
--- TEXTO VELOCIDAD
+--==================================================
+-- VELOCIDAD
+--==================================================
+
 local speedLabel = Instance.new("TextLabel")
-speedLabel.Size = UDim2.new(1, -40, 0, 55)
-speedLabel.Position = UDim2.new(0, 20, 0, 80)
+speedLabel.Size = UDim2.new(1, -40, 0, 50)
+speedLabel.Position = UDim2.fromOffset(20, 82)
 speedLabel.BackgroundTransparency = 1
 speedLabel.Text = "Velocidad: 16"
-speedLabel.TextColor3 = Color3.fromRGB(255,255,255)
-speedLabel.TextSize = 22
+speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedLabel.TextSize = 21
 speedLabel.Font = Enum.Font.GothamSemibold
+speedLabel.ZIndex = 5
 speedLabel.Parent = menu
 
--- FUNCIÓN PARA CREAR BOTONES
-local function createButton(text, position)
+--==================================================
+-- CREADOR DE BOTONES
+--==================================================
+
+local function createButton(text, y)
+
 	local button = Instance.new("TextButton")
-	button.Size = UDim2.new(1, -40, 0, 50)
-	button.Position = position
-	button.BackgroundColor3 = Color3.fromRGB(12, 20, 40)
+
+	button.Size = UDim2.new(1, -40, 0, 52)
+	button.Position = UDim2.fromOffset(20, y)
+
+	button.BackgroundColor3 =
+		Color3.fromRGB(9, 19, 38)
+
 	button.Text = text
-	button.TextColor3 = Color3.fromRGB(255,255,255)
-	button.TextSize = 18
+	button.TextColor3 =
+		Color3.fromRGB(240, 250, 255)
+
+	button.TextSize = 17
 	button.Font = Enum.Font.GothamBold
+
 	button.AutoButtonColor = false
+	button.ZIndex = 5
 	button.Parent = menu
 
 	local corner = Instance.new("UICorner")
@@ -107,105 +239,258 @@ local function createButton(text, position)
 	corner.Parent = button
 
 	local stroke = Instance.new("UIStroke")
-	stroke.Color = Color3.fromRGB(0, 170, 255)
+	stroke.Color = Color3.fromRGB(0, 180, 255)
 	stroke.Thickness = 2
 	stroke.Parent = button
 
-	-- Efecto al pasar/pulsar
 	button.MouseEnter:Connect(function()
+
 		TweenService:Create(
 			button,
 			TweenInfo.new(0.15),
-			{BackgroundColor3 = Color3.fromRGB(15, 50, 85)}
+			{
+				BackgroundColor3 =
+					Color3.fromRGB(12, 48, 80)
+			}
 		):Play()
+
 	end)
 
 	button.MouseLeave:Connect(function()
+
 		TweenService:Create(
 			button,
 			TweenInfo.new(0.15),
-			{BackgroundColor3 = Color3.fromRGB(12, 20, 40)}
+			{
+				BackgroundColor3 =
+					Color3.fromRGB(9, 19, 38)
+			}
 		):Play()
+
 	end)
 
 	return button
 end
 
--- BOTONES
-local increaseButton = createButton(
-	"▲  SUBIR VELOCIDAD",
-	UDim2.new(0, 20, 0, 145)
-)
+local increaseButton =
+	createButton(
+		"▲  SUBIR VELOCIDAD",
+		145
+	)
 
-local decreaseButton = createButton(
-	"▼  BAJAR VELOCIDAD",
-	UDim2.new(0, 20, 0, 205)
-)
+local decreaseButton =
+	createButton(
+		"▼  BAJAR VELOCIDAD",
+		207
+	)
 
--- ACTUALIZAR VELOCIDAD
-local function updateSpeed()
-	currentSpeed = math.clamp(currentSpeed, MIN_SPEED, MAX_SPEED)
+--==================================================
+-- APLICAR VELOCIDAD
+--==================================================
 
-	speedLabel.Text = "Velocidad: " .. currentSpeed
+local function applySpeed()
 
-	local character = player.Character
-	if character then
-		local humanoid = character:FindFirstChildOfClass("Humanoid")
+	currentSpeed = math.clamp(
+		currentSpeed,
+		MIN_SPEED,
+		MAX_SPEED
+	)
 
-		if humanoid then
-			humanoid.WalkSpeed = currentSpeed
-		end
+	speedLabel.Text =
+		"Velocidad: " .. currentSpeed
+
+	local character =
+		player.Character
+
+	if not character then
+		return
+	end
+
+	local humanoid =
+		character:FindFirstChildOfClass(
+			"Humanoid"
+		)
+
+	if humanoid then
+		humanoid.WalkSpeed =
+			currentSpeed
 	end
 end
 
--- SUBIR
+--==================================================
+-- SUBIR VELOCIDAD
+--==================================================
+
 increaseButton.MouseButton1Click:Connect(function()
+
 	currentSpeed += SPEED_STEP
-	updateSpeed()
+
+	applySpeed()
+
 end)
 
--- BAJAR
+--==================================================
+-- BAJAR VELOCIDAD
+--==================================================
+
 decreaseButton.MouseButton1Click:Connect(function()
+
 	currentSpeed -= SPEED_STEP
-	updateSpeed()
+
+	applySpeed()
+
 end)
 
--- REAPLICAR DESPUÉS DE MORIR
-player.CharacterAdded:Connect(function(character)
-	local humanoid = character:WaitForChild("Humanoid")
-	humanoid.WalkSpeed = currentSpeed
-end)
+--==================================================
+-- MANTENER VELOCIDAD
+--==================================================
 
--- ABRIR/CERRAR MENÚ
+local function protectSpeed(humanoid)
+
+	if not humanoid then
+		return
+	end
+
+	humanoid.WalkSpeed =
+		currentSpeed
+
+	humanoid:GetPropertyChangedSignal(
+		"WalkSpeed"
+	):Connect(function()
+
+		if humanoid.Parent
+			and humanoid.WalkSpeed
+			~= currentSpeed then
+
+			task.defer(function()
+
+				if humanoid.Parent then
+
+					humanoid.WalkSpeed =
+						currentSpeed
+
+				end
+
+			end)
+
+		end
+
+	end)
+
+end
+
+--==================================================
+-- PERSONAJE
+--==================================================
+
+local function setupCharacter(character)
+
+	local humanoid =
+		character:WaitForChild(
+			"Humanoid"
+		)
+
+	humanoid.WalkSpeed =
+		currentSpeed
+
+	protectSpeed(humanoid)
+
+end
+
+if player.Character then
+
+	setupCharacter(
+		player.Character
+	)
+
+end
+
+player.CharacterAdded:Connect(
+	setupCharacter
+)
+
+--==================================================
+-- BOTÓN SC: ABRIR / CERRAR
+--==================================================
+
 local menuOpen = false
 
 scButton.MouseButton1Click:Connect(function()
+
 	menuOpen = not menuOpen
 
 	if menuOpen then
+
 		menu.Visible = true
-		menu.Size = UDim2.new(0, 280, 0, 260)
+
+		menu.Size =
+			UDim2.fromOffset(
+				280,
+				265
+			)
 
 		TweenService:Create(
 			menu,
-			TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+			TweenInfo.new(
+				0.25,
+				Enum.EasingStyle.Back,
+				Enum.EasingDirection.Out
+			),
 			{
-				Size = UDim2.new(0, 330, 0, 310)
+				Size =
+					UDim2.fromOffset(
+						340,
+						320
+					)
 			}
 		):Play()
+
 	else
-		TweenService:Create(
-			menu,
-			TweenInfo.new(0.15),
-			{
-				Size = UDim2.new(0, 280, 0, 260)
-			}
-		):Play()
 
-		task.wait(0.15)
+		local closeTween =
+			TweenService:Create(
+				menu,
+				TweenInfo.new(
+					0.15,
+					Enum.EasingStyle.Quad,
+					Enum.EasingDirection.In
+				),
+				{
+					Size =
+						UDim2.fromOffset(
+							280,
+							265
+						)
+				}
+			)
+
+		closeTween:Play()
+
+		closeTween.Completed:Wait()
+
 		menu.Visible = false
+
 	end
+
 end)
 
--- VELOCIDAD INICIAL
-updateSpeed()
+--==================================================
+-- EFECTO BOTÓN SC
+--==================================================
+
+scButton.MouseEnter:Connect(function()
+
+	TweenService:Create(
+		scButton,
+		TweenInfo.new(0.15),
+		{
+			BackgroundColor3 =
+				Color3.fromRGB(10, 45, 75)
+		}
+	):Play()
+
+end)
+
+scButton.MouseLeave:Connect(function()
+
+	TweenService:Create(
