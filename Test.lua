@@ -48,6 +48,7 @@ menu.Size = UDim2.new(0, 330, 0, 310)
 menu.Position = UDim2.new(0.5, -165, 0.5, -155)
 menu.BackgroundColor3 = Color3.fromRGB(8, 12, 25)
 menu.Visible = false
+menu.ClipsDescendants = true
 menu.Parent = gui
 
 local menuCorner = Instance.new("UICorner")
@@ -59,6 +60,91 @@ menuStroke.Color = Color3.fromRGB(0, 170, 255)
 menuStroke.Thickness = 2
 menuStroke.Parent = menu
 
+-- ❄️ COPOS DE NIEVE
+local snowContainer = Instance.new("Frame")
+snowContainer.Name = "SnowContainer"
+snowContainer.Size = UDim2.new(1, 0, 1, 0)
+snowContainer.BackgroundTransparency = 1
+snowContainer.ClipsDescendants = true
+snowContainer.ZIndex = 2
+snowContainer.Parent = menu
+
+local function createSnowflake()
+
+	local snowflake = Instance.new("TextLabel")
+
+	local size = math.random(7, 15)
+
+	snowflake.Size = UDim2.new(0, size, 0, size)
+
+	snowflake.Position = UDim2.new(
+		math.random(0, 100) / 100,
+		0,
+		-0.1,
+		0
+	)
+
+	snowflake.BackgroundTransparency = 1
+	snowflake.Text = "❄"
+	snowflake.TextColor3 = Color3.fromRGB(
+		220,
+		245,
+		255
+	)
+
+	snowflake.TextTransparency =
+		math.random(0, 25) / 100
+
+	snowflake.TextSize = size + 5
+	snowflake.Font = Enum.Font.GothamBold
+	snowflake.ZIndex = 3
+	snowflake.Parent = snowContainer
+
+	local duration = math.random(4, 8)
+
+	local endX =
+		math.random(-10, 110) / 100
+
+	local tween = TweenService:Create(
+		snowflake,
+		TweenInfo.new(
+			duration,
+			Enum.EasingStyle.Linear
+		),
+		{
+			Position = UDim2.new(
+				endX,
+				0,
+				1.1,
+				0
+			),
+			Rotation = math.random(-180, 180)
+		}
+	)
+
+	tween:Play()
+
+	tween.Completed:Connect(function()
+		snowflake:Destroy()
+	end)
+
+end
+
+-- GENERADOR DE COPOS
+task.spawn(function()
+
+	while gui.Parent do
+
+		if menu.Visible then
+			createSnowflake()
+		end
+
+		task.wait(0.12)
+
+	end
+
+end)
+
 -- TÍTULO
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, -30, 0, 55)
@@ -68,6 +154,7 @@ title.Text = "secreth C v1"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextSize = 26
 title.Font = Enum.Font.GothamBold
+title.ZIndex = 5
 title.Parent = menu
 
 -- LÍNEA DECORATIVA
@@ -76,6 +163,7 @@ line.Size = UDim2.new(1, -40, 0, 2)
 line.Position = UDim2.new(0, 20, 0, 65)
 line.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 line.BorderSizePixel = 0
+line.ZIndex = 5
 line.Parent = menu
 
 -- TEXTO VELOCIDAD
@@ -87,6 +175,7 @@ speedLabel.Text = "Velocidad: 16"
 speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 speedLabel.TextSize = 22
 speedLabel.Font = Enum.Font.GothamSemibold
+speedLabel.ZIndex = 5
 speedLabel.Parent = menu
 
 -- FUNCIÓN PARA CREAR BOTONES
@@ -102,6 +191,7 @@ local function createButton(text, position)
 	button.TextSize = 18
 	button.Font = Enum.Font.GothamBold
 	button.AutoButtonColor = false
+	button.ZIndex = 5
 	button.Parent = menu
 
 	local corner = Instance.new("UICorner")
@@ -271,6 +361,33 @@ scButton.MouseButton1Click:Connect(function()
 		menu.Visible = false
 
 	end
+
+end)
+
+-- EFECTO DEL BOTÓN SC
+scButton.MouseEnter:Connect(function()
+
+	TweenService:Create(
+		scButton,
+		TweenInfo.new(0.15),
+		{
+			BackgroundColor3 =
+				Color3.fromRGB(10, 45, 75)
+		}
+	):Play()
+
+end)
+
+scButton.MouseLeave:Connect(function()
+
+	TweenService:Create(
+		scButton,
+		TweenInfo.new(0.15),
+		{
+			BackgroundColor3 =
+				Color3.fromRGB(10, 15, 30)
+		}
+	):Play()
 
 end)
 
